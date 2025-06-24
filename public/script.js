@@ -1,6 +1,10 @@
 async function enviarMensaje() {
-  const mensaje = document.getElementById('mensaje').value;
+  const mensaje = document.getElementById('mensaje').value.trim();
 
+  if(!mensaje){
+  document.getElementById('respuesta').innerText = "Te voy a pegar si vuelves a mandar algo vacio";
+  return;
+  };
   const res = await fetch('/messages', {
     method: 'POST',
     headers: {
@@ -10,5 +14,5 @@ async function enviarMensaje() {
   });
 
   const data = await res.json();
-  document.getElementById('respuesta').innerText = data.respuesta;
+  document.getElementById('respuesta').innerText = data.respuesta || "Lo siento, no encontre coincidencias con tu busqueda";
 }

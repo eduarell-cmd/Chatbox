@@ -3,11 +3,10 @@ const router = express.Router();
 const Respuesta = require('../models/Respuesta');
 
 const patrones = [
-  { clave: "saludo", regex: /\b(hola|buenas|hey|hello|qué onda|holi)\b/i },
+  { clave: "saludo", regex: /\b(hola|buenas|hey|hello|q onda|holi|ola|oli|q onda)\b/i },
 ];
 
 router.post('/', async (req, res) => {
-  console.log('Body recibido:', req.body);
   const mensaje = req.body?.mensaje;
 
   if (!mensaje) {
@@ -16,6 +15,7 @@ router.post('/', async (req, res) => {
   }
 
   const encontrado = patrones.find(p => p.regex.test(mensaje));
+
   if (!encontrado) {
     console.log('No coincidió patrón para:', mensaje);
     return res.json({ respuesta: "Lo siento, no entendí eso." });
