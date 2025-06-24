@@ -1,21 +1,35 @@
 const express = require('express');
 const router = express.Router();
-const Message = require('../models/models'); // si el archivo se llama models.js
+const Respuesta = require('../models/Respuesta');
 
-// Obtener mensajes
-router.get('/', async (req, res) => {
-  const messages = await Message.find().sort({ timestamp: 1 });
-  res.json(messages);
-});
+const patrones = [
+  { clave: "saludo", regex: /\b(hola|buenas|hey|hello|qué onda|holi)\b/i },
+];
 
-// Enviar mensaje
 router.post('/', async (req, res) => {
-  const { text } = req.body;
-  if (!text) return res.status(400).json({ error: 'El mensaje está vacío' });
+  console.log('Body recibido:', req.body);
+  const mensaje = req.body?.mensaje;
 
-  const newMessage = new Message({ text });
-  await newMessage.save();
-  res.status(201).json(newMessage);
+  if (!mensaje) {
+    console.log('No se recibió mensaje');
+    return res.status(400).json({ error: 'No enviaste mensaje' });
+  }
+
+  const encontrado = patrones.find(p => p.regex.test(mensaje));
+  if (!encontrado) {
+    console.log('No coincidió patrón para:', mensaje);
+    return res.json({ respuesta: "Lo siento, no entendí eso." });
+  }
+
+  try {
+    const respuesta = await Respuesta.findOne({ clave: encontrado.clave });
+    console.log('Respuesta DB:', respuesta);
+    return res.json({ respuesta: respuesta?.respuesta || "No encontré una respuesta para eso." });
+  } catch (error) {
+    console.error('Error DB:', error);
+    return res.status(500).json({ error: 'Error interno en base de datos' });
+  }
 });
+
 
 module.exports = router;
