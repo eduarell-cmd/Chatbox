@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const messageRoutes = require('./routes/messages');
-const historialRoutes = require('./routes/historial'); 
+const historialRoutes = require('./models/historial'); 
 
 const app = express();
 const PORT = 3000;

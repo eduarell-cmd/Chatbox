@@ -34,17 +34,17 @@ router.post('/', async (req, res) => {
       const tecnica = await Respuesta.findOne({ clave: claveTecnica });
       const respuestaTexto = tecnica?.respuesta || "No encontré técnicas para esa emoción 😕";
 
-      await historial.create({ mensajeUsuario: mensaje, respuestaBot: respuestaTexto });
+      await historial.create({ mensaje, respuesta: respuestaTexto });
       return res.json({ respuesta: respuestaTexto });
     }
     if (/\b(no|nop|nel|noup|nanais|ni madres)\b/.test(mensaje)) {
       esperandoTecnica = null;
       const respuestaTexto = "Va, si necesitas algo más, aquí estoy";
-      await historial.create({ mensajeUsuario: mensaje, respuestaBot: respuestaTexto });
+      await historial.create({ mensaje, respuesta: respuestaTexto });
       return res.json({ respuesta: respuestaTexto });
     }
     const respuestaTexto = "Por favor responde sí o no a la pregunta sobre técnicas.";
-    await historial.create({ mensajeUsuario: mensaje, respuestaBot: respuestaTexto });
+    await historial.create({ mensaje, respuesta: respuestaTexto });
     return res.json({ respuesta: respuestaTexto });
   }
 
@@ -58,17 +58,17 @@ router.post('/', async (req, res) => {
       const texto = `Por ejemplo, si detecto ${emocionRandom}, te diría: ${consejo?.respuesta || 'No encontré consejo.'} ¿Quieres unas técnicas de regulación?`;
 
       esperandoTecnica = emocionRandom;
-      await historial.create({ mensajeUsuario: mensaje, respuestaBot: texto });
+      await historial.create({ mensaje, respuesta: texto });
       return res.json({ respuesta: texto });
     }
     if (/\b(no|nop|nel|noup|nanais|ni madres)\b/.test(mensaje)) {
       esperandorespuesta = false;
       const texto = "¡Entiendo! ¿Te puedo ayudar con algo más?";
-      await historial.create({ mensajeUsuario: mensaje, respuestaBot: texto });
+      await historial.create({ mensaje, respuesta: texto });
       return res.json({ respuesta: texto });
     }
     const texto = "Por favor responde sí o no a la pregunta sobre emociones.";
-    await historial.create({ mensajeUsuario: mensaje, respuestaBot: texto });
+    await historial.create({ mensaje, respuesta: texto });
     return res.json({ respuesta: texto });
   }
 
@@ -78,7 +78,7 @@ router.post('/', async (req, res) => {
     const respuesta = await Respuesta.findOne({ clave: "emociones" });
     const texto = respuesta?.respuesta || "Sí, detecto emociones.";
 
-    await historial.create({ mensajeUsuario: mensaje, respuestaBot: texto });
+    await historial.create({ mensaje, respuesta: texto });
     return res.json({ respuesta: texto });
   }
 
@@ -86,7 +86,7 @@ router.post('/', async (req, res) => {
   const encontrado = patrones.find(p => p.regex.test(mensaje));
   if (!encontrado) {
     const texto = "Lo siento, no entendí eso.";
-    await historial.create({ mensajeUsuario: mensaje, respuestaBot: texto });
+    await historial.create({ mensaje, respuesta: texto });
     return res.json({ respuesta: texto });
   }
 
@@ -98,17 +98,28 @@ router.post('/', async (req, res) => {
       const link = `data:application/pdf;base64,${pdfBase64}`;
       const texto = `Aquí tienes el manual en PDF: <a href="${link}" target="_blank">Ver PDF</a>`;
 
-      await historial.create({ mensajeUsuario: mensaje, respuestaBot: texto });
+      await historial.create({ mensaje, respuesta: texto });
       return res.json({ respuesta: texto });
     }
 
     const texto = respuesta?.respuesta || "No encontré una respuesta para eso.";
-    await historial.create({ mensajeUsuario: mensaje, respuestaBot: texto });
+    await historial.create({ mensaje, respuesta: texto });
     return res.json({ respuesta: texto });
 
   } catch (error) {
     console.error('Error DB:', error);
     return res.status(500).json({ error: 'Error interno en base de datos' });
+  }
+});
+
+// ✅ Ruta para obtener historial
+router.get('/', async (req, res) => {
+  try {
+    const historialCompleto = await historial.find().sort({ fecha: 1 });
+    res.json(historialCompleto);
+  } catch (error) {
+    console.error('Error al obtener historial:', error);
+    res.status(500).json({ error: 'Error al obtener historial' });
   }
 });
 

@@ -42,10 +42,11 @@ window.onload = async () => {
     const res = await fetch('/historial');
     const historial = await res.json();
 
-    historial.forEach(m => {
-      if (m.usuario) agregarMensaje(m.usuario, 'usuario');
-      if (m.bot) agregarMensaje(m.bot, 'bot');
-    });
+  historial.forEach(m => {
+    if (m.mensaje) agregarMensaje(m.mensaje, 'usuario');
+    if (m.respuesta) agregarMensaje(m.respuesta, 'bot');
+  });
+
   } catch (error) {
     console.error("No se pudo cargar el historial:", error);
   }
