@@ -36,3 +36,17 @@ function agregarMensaje(texto, tipo) {
   chat.appendChild(burbuja);
   chat.scrollTop = chat.scrollHeight;
 }
+
+window.onload = async () => {
+  try {
+    const res = await fetch('/historial');
+    const historial = await res.json();
+
+    historial.forEach(m => {
+      if (m.usuario) agregarMensaje(m.usuario, 'usuario');
+      if (m.bot) agregarMensaje(m.bot, 'bot');
+    });
+  } catch (error) {
+    console.error("No se pudo cargar el historial:", error);
+  }
+};

@@ -6,12 +6,14 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    
-    <div id="chat-container">
-      <div id="chat"></div>
-      <div class="input-area">
-        <input type="text" id="mensaje" placeholder="Escribele algo al ChaBot" onkeydown="if(event.key==='Enter') enviarMensaje()">
-        <button onclick="enviarMensaje()">Enviar</button>
+    <div id="main-wrapper">
+      <h1>ChatBot de MAI</h1>
+      <div id="chat-container">
+        <div id="chat"></div>
+        <div class="input-area">
+          <input type="text" id="mensaje" placeholder="Escríbele algo al ChatBot" onkeydown="if(event.key==='Enter') enviarMensaje()">
+          <button onclick="enviarMensaje()">Enviar</button>
+        </div>
       </div>
     </div>
     <script src="script.js"></script>

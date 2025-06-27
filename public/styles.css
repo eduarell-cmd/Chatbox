@@ -13,6 +13,20 @@ body {
   height: 100vh;
 }
 
+#main-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+h1 {
+  color: white;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
 #chat-container {
   background: #343434;
   width: 80%;
@@ -20,7 +34,7 @@ body {
   height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 0 20px rgba(0,0,0,0.15);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
   border-radius: 10px;
   overflow: hidden;
 }
@@ -74,6 +88,7 @@ body {
   padding: 10px 15px;
   border-radius: 15px;
   max-width: 70%;
+  color: white;
 }
 
 .mensaje-bot {
@@ -82,4 +97,5 @@ body {
   padding: 10px 15px;
   border-radius: 15px;
   max-width: 70%;
+  color: black;
 }
