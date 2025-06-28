@@ -1,225 +1,126 @@
-let currentChatId = null;
-let chatHistory = [];
+const express = require('express');
+const router = express.Router();
+const Respuesta = require('../models/Respuesta');
+const historial = require('../models/historial');
 
-// Your existing functions with modifications
-async function enviarMensaje() {
-  const input = document.getElementById('mensaje');
-  const mensaje = input.value.trim();
+const patrones = [
+  { clave: "saludo", regex: /\b(hola|buenas|hey|hello|q onda|holi|ola|oli|q show)\b/i },
+  { clave: "emociones", regex: /\b(qué|cuáles|cuales|es cierto que|puedes|sabes)?\s*(emociones|sentimientos)\b.*\b(manejas|detectas|reconoces|lees|procesas|usas|analizas|describes|muestras|sabes|interpreta(s)?)\b|\b(manejas|detectas|reconoces|lees|procesas|usas|analizas|describes|muestras|sabes|interpreta(s)?)\b.*\b(emociones|sentimientos)\b/i },
+  { clave: "enojo", regex: /\b(enojo|enojado|molesto|ira|rabia|furia)\b/i },
+  { clave: "disgusto", regex: /\b(disgusto|asco|repulsión|desagrado|me desagrada)\b/i },
+  { clave: "miedo", regex: /\b(miedo|temor|pánico|me asusta|asustado|ansiedad)\b/i },
+  { clave: "felicidad", regex: /\b(feliz|felicidad|alegría|contento|me siento bien)\b/i },
+  { clave: "tristeza", regex: /\b(triste|tristeza|deprimido|melancolía|desanimado|llorando)\b/i },
+  { clave: "sorpresa", regex: /\b(sorpresa|sorprendido|inesperado|me sorprendió|sorprendente)\b/i },
+  { clave: "neutral", regex: /\b(neutral|normal|me siento bien|me siento ok|ni bien ni mal|meh)\b/i },
+  { clave: "funcionamiento", regex: /\b(manual|guía|instrucciones|ayuda|cómo usar|como funciona|uso|funciona)\b/i }
+];
+
+let esperandorespuesta = false;
+let esperandoTecnica = null;
+
+router.post('/', async (req, res) => {
+  const mensaje = req.body?.mensaje?.toLowerCase();
+
   if (!mensaje) {
-    document.getElementById('respuesta').innerText = "Te voy a pegar si vuelves a mandar algo vacío";
-    return;
+    return res.status(400).json({ error: 'No enviaste mensaje' });
   }
-  
-  // Mostrar el mensaje del usuario en el chat
-  agregarMensaje(mensaje, 'usuario');
-  input.value = '';
-  
+
+  // Si esperamos respuesta de técnicas
+  if (esperandoTecnica) {
+    if (/\b(sí|si|claro|dale|va|ok|porfa)\b/.test(mensaje)) {
+      const claveTecnica = "T" + esperandoTecnica;
+      esperandoTecnica = null;
+      const tecnica = await Respuesta.findOne({ clave: claveTecnica });
+      const respuestaTexto = tecnica?.respuesta || "No encontré técnicas para esa emoción 😕";
+
+      await historial.create({ mensaje, respuesta: respuestaTexto });
+      return res.json({ respuesta: respuestaTexto });
+    }
+    if (/\b(no|nop|nel|noup|nanais|ni madres)\b/.test(mensaje)) {
+      esperandoTecnica = null;
+      const respuestaTexto = "Va, si necesitas algo más, aquí estoy";
+      await historial.create({ mensaje, respuesta: respuestaTexto });
+      return res.json({ respuesta: respuestaTexto });
+    }
+    const respuestaTexto = "Por favor responde sí o no a la pregunta sobre técnicas.";
+    await historial.create({ mensaje, respuesta: respuestaTexto });
+    return res.json({ respuesta: respuestaTexto });
+  }
+
+  // Si esperamos respuesta de emociones
+  if (esperandorespuesta) {
+    if (/\b(sí|si|claro|dale|va|ok|porfa)\b/.test(mensaje)) {
+      esperandorespuesta = false;
+      const emociones = ["enojo", "disgusto", "miedo", "felicidad", "tristeza", "sorpresa", "neutral"];
+      const emocionRandom = emociones[Math.floor(Math.random() * emociones.length)];
+      const consejo = await Respuesta.findOne({ clave: emocionRandom });
+      const texto = `Por ejemplo, si detecto ${emocionRandom}, te diría: ${consejo?.respuesta || 'No encontré consejo.'} ¿Quieres unas técnicas de regulación?`;
+
+      esperandoTecnica = emocionRandom;
+      await historial.create({ mensaje, respuesta: texto });
+      return res.json({ respuesta: texto });
+    }
+    if (/\b(no|nop|nel|noup|nanais|ni madres)\b/.test(mensaje)) {
+      esperandorespuesta = false;
+      const texto = "¡Entiendo! ¿Te puedo ayudar con algo más?";
+      await historial.create({ mensaje, respuesta: texto });
+      return res.json({ respuesta: texto });
+    }
+    const texto = "Por favor responde sí o no a la pregunta sobre emociones.";
+    await historial.create({ mensaje, respuesta: texto });
+    return res.json({ respuesta: texto });
+  }
+
+  // Si pregunta por emociones
+  if (/\b(emociones?|sentimientos?)\b.*\b(manejas|detectas|reconoces|lees|procesas|usas|tomas en cuenta)\b|\b(manejas|detectas|reconoces|lees|procesas|usas)\b.*\b(emociones?|sentimientos?)\b/.test(mensaje)) {
+    esperandorespuesta = true;
+    const respuesta = await Respuesta.findOne({ clave: "emociones" });
+    const texto = respuesta?.respuesta || "Sí, detecto emociones.";
+
+    await historial.create({ mensaje, respuesta: texto });
+    return res.json({ respuesta: texto });
+  }
+
+  // Buscar en patrones normales
+  const encontrado = patrones.find(p => p.regex.test(mensaje));
+  if (!encontrado) {
+    const texto = "Lo siento, no entendí eso.";
+    await historial.create({ mensaje, respuesta: texto });
+    return res.json({ respuesta: texto });
+  }
+
   try {
-    const res = await fetch('/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ mensaje })
-    });
-    const data = await res.json();
-    const respuesta = data.respuesta || "Lo siento, no encontré coincidencias con tu búsqueda.";
-    agregarMensaje(respuesta, 'bot');
-    
-    // Reload chat history after sending message
-    loadChatHistory();
-    
+    const respuesta = await Respuesta.findOne({ clave: encontrado.clave });
+
+    if (encontrado.clave === "manual" && respuesta?.respuesta) {
+      const pdfBase64 = respuesta.respuesta;
+      const link = `data:application/pdf;base64,${pdfBase64}`;
+      const texto = `Aquí tienes el manual en PDF: <a href="${link}" target="_blank">Ver PDF</a>`;
+
+      await historial.create({ mensaje, respuesta: texto });
+      return res.json({ respuesta: texto });
+    }
+
+    const texto = respuesta?.respuesta || "No encontré una respuesta para eso.";
+    await historial.create({ mensaje, respuesta: texto });
+    return res.json({ respuesta: texto });
+
   } catch (error) {
-    agregarMensaje("Hubo un error al conectarse con el bot.", 'bot');
+    console.error('Error DB:', error);
+    return res.status(500).json({ error: 'Error interno en base de datos' });
   }
-}
+});
 
-function agregarMensaje(texto, tipo) {
-  const chat = document.getElementById('chat');
-  const burbuja = document.createElement('div');
-  burbuja.classList.add(tipo === 'usuario' ? 'mensaje-usuario' : 'mensaje-bot');
-  burbuja.textContent = texto;
-  chat.appendChild(burbuja);
-  chat.scrollTop = chat.scrollHeight;
-}
-
-// Modified window.onload to include new functionality
-window.onload = async () => {
-  console.log('Página cargada, iniciando...');
-  
-  // Load initial historial (your existing logic)
+// ✅ Ruta para obtener historial
+router.get('/', async (req, res) => {
   try {
-    console.log('Intentando cargar historial inicial...');
-    const res = await fetch('/messages');
-    if (res.ok) {
-      const historial = await res.json();
-      console.log('Historial inicial cargado:', historial);
-      historial.forEach(m => {
-        if (m.mensaje) agregarMensaje(m.mensaje, 'usuario');
-        if (m.respuesta) agregarMensaje(m.respuesta, 'bot');
-      });
-      
-      // Use the same data for chat history if it loaded successfully
-      chatHistory = historial;
-      renderHistoryList();
-    } else {
-      console.error('Error al cargar historial inicial:', res.status);
-    }
+    const historialCompleto = await historial.find().sort({ fecha: 1 });
+    res.json(historialCompleto);
   } catch (error) {
-    console.error("No se pudo cargar el historial:", error);
+    console.error('Error al obtener historial:', error);
+    res.status(500).json({ error: 'Error al obtener historial' });
   }
-  
-  // Setup toggle button regardless of data loading
-  setupToggleButton();
-};
+});
 
-// New functions for chat history functionality
-function setupToggleButton() {
-  const toggleBtn = document.getElementById('toggle-history');
-  const sidebar = document.getElementById('history-sidebar');
-  
-  console.log('Toggle button:', toggleBtn);
-  console.log('Sidebar:', sidebar);
-  
-  if (toggleBtn && sidebar) {
-    toggleBtn.addEventListener('click', function() {
-      console.log('Toggle clicked');
-      sidebar.classList.toggle('open');
-    });
-
-    // Close sidebar when clicking outside on mobile
-    document.addEventListener('click', function(e) {
-      if (window.innerWidth <= 768) {
-        if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
-          sidebar.classList.remove('open');
-        }
-      }
-    });
-  } else {
-    console.error('No se encontraron elementos del sidebar');
-  }
-}
-
-async function loadChatHistory() {
-  try {
-    console.log('Cargando historial de chats...');
-    const response = await fetch('/messages');
-    if (response.ok) {
-      chatHistory = await response.json();
-      console.log('Historial cargado:', chatHistory);
-      renderHistoryList();
-    } else {
-      console.log('Error en respuesta:', response.status);
-      // Show message in sidebar if server is not responding
-      const historyList = document.getElementById('history-list');
-      if (historyList) {
-        historyList.innerHTML = '<div style="text-align: center; opacity: 0.6; padding: 20px; color: #ff6b6b;">Error del servidor</div>';
-      }
-    }
-  } catch (error) {
-    console.error('Error loading chat history:', error);
-    // Show error message in sidebar
-    const historyList = document.getElementById('history-list');
-    if (historyList) {
-      historyList.innerHTML = '<div style="text-align: center; opacity: 0.6; padding: 20px; color: #ff6b6b;">Sin conexión al servidor</div>';
-    }
-  }
-}
-
-function renderHistoryList() {
-  const historyList = document.getElementById('history-list');
-  console.log('Elemento history-list encontrado:', historyList);
-  console.log('Datos del historial:', chatHistory);
-  
-  if (!historyList) {
-    console.error('No se encontró el elemento history-list');
-    return;
-  }
-  
-  historyList.innerHTML = '';
-
-  if (chatHistory.length === 0) {
-    console.log('No hay historial');
-    historyList.innerHTML = '<div style="text-align: center; opacity: 0.6; padding: 20px; color: #ccc;">No hay historial aún</div>';
-    return;
-  }
-
-  console.log('Renderizando', chatHistory.length, 'elementos');
-  
-  chatHistory.forEach((chat, index) => {
-    console.log('Procesando chat:', chat);
-    
-    const historyItem = document.createElement('div');
-    historyItem.className = 'history-item';
-    historyItem.onclick = () => loadChat(chat._id || chat.id || index);
-    
-    // Handle different date formats
-    let formattedDate = 'Fecha desconocida';
-    if (chat.fecha) {
-      const date = new Date(chat.fecha);
-      formattedDate = date.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    }
-
-    const mensajePreview = chat.mensaje ? chat.mensaje.substring(0, 50) : 'Sin mensaje';
-
-    historyItem.innerHTML = `
-      <div class="history-date">${formattedDate}</div>
-      <div class="history-preview">${mensajePreview}${chat.mensaje && chat.mensaje.length > 50 ? '...' : ''}</div>
-    `;
-
-    historyList.appendChild(historyItem);
-  });
-}
-
-async function loadChat(chatId) {
-  try {
-    // Remove active class from all items
-    document.querySelectorAll('.history-item').forEach(item => {
-      item.classList.remove('active');
-    });
-
-    // Add active class to clicked item
-    event.target.closest('.history-item').classList.add('active');
-
-    currentChatId = chatId;
-    
-    // Find the chat in the current history
-    const chat = chatHistory.find(c => c._id === chatId || c.id === chatId);
-    if (chat) {
-      displayChatMessages(chat);
-    }
-
-    // Close sidebar on mobile after selection
-    if (window.innerWidth <= 768) {
-      const sidebar = document.getElementById('history-sidebar');
-      if (sidebar) sidebar.classList.remove('open');
-    }
-  } catch (error) {
-    console.error('Error loading chat:', error);
-  }
-}
-
-function displayChatMessages(chat) {
-  const chatDiv = document.getElementById('chat');
-  chatDiv.innerHTML = '';
-
-  // Display user message using your existing function
-  agregarMensaje(chat.mensaje, 'usuario');
-  
-  // Display bot response using your existing function
-  agregarMensaje(chat.respuesta, 'bot');
-}
-
-function startNewChat() {
-  currentChatId = null;
-  document.getElementById('chat').innerHTML = '';
-  document.querySelectorAll('.history-item').forEach(item => {
-    item.classList.remove('active');
-  });
-}
+module.exports = router;
