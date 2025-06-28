@@ -6,16 +6,31 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <button id="toggle-history">☰</button>
+    
     <div id="main-wrapper">
-      <h1>ChatBot de MAI</h1>
-      <div id="chat-container">
-        <div id="chat"></div>
-        <div class="input-area">
-          <input type="text" id="mensaje" placeholder="Escríbele algo al ChatBot" onkeydown="if(event.key==='Enter') enviarMensaje()">
-          <button onclick="enviarMensaje()">Enviar</button>
+      <!-- History Sidebar -->
+      <div id="history-sidebar">
+        <h3>Historial de Chats</h3>
+        <button id="new-chat-btn" onclick="startNewChat()">+ Nuevo Chat</button>
+        <div id="history-list">
+          <!-- History items will be populated here -->
+        </div>
+      </div>
+
+      <!-- Chat Area -->
+      <div id="chat-area">
+        <h1>ChatBot de MAI</h1>
+        <div id="chat-container">
+          <div id="chat"></div>
+          <div class="input-area">
+            <input type="text" id="mensaje" placeholder="Escríbele algo al ChatBot" onkeydown="if(event.key==='Enter') enviarMensaje()">
+            <button onclick="enviarMensaje()">Enviar</button>
+          </div>
         </div>
       </div>
     </div>
+
     <script src="script.js"></script>
   </body>
 </html>
