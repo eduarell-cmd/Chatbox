@@ -1,13 +1,21 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <title>ChatBot</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <div id="main-wrapper">
-      <h1>ChatBot de MAI</h1>
+<head>
+  <meta charset="UTF-8" />
+  <title>ChatBot</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="main-wrapper">
+    <h1>ChatBot de MAI</h1>
+    <div id="content-wrapper">
+      <!-- Sidebar de historial -->
+      <div id="sidebar">
+        <h2>Historial</h2>
+        <ul id="lista-historial"></ul>
+      </div>
+
+      <!-- Contenedor principal del chat -->
       <div id="chat-container">
         <div id="chat"></div>
         <div class="input-area">
@@ -16,6 +24,7 @@
         </div>
       </div>
     </div>
-    <script src="script.js"></script>
-  </body>
+  </div>
+  <script src="script.js"></script>
+</body>
 </html>

@@ -42,12 +42,25 @@ window.onload = async () => {
     const res = await fetch('/historial');
     const historial = await res.json();
 
-  historial.forEach(m => {
-    if (m.mensaje) agregarMensaje(m.mensaje, 'usuario');
-    if (m.respuesta) agregarMensaje(m.respuesta, 'bot');
-  });
+    const listaHistorial = document.getElementById('lista-historial');
+
+    historial.forEach(m => {
+      if (m.mensaje) {
+        agregarMensaje(m.mensaje, 'usuario');
+        const item = document.createElement('li');
+        item.textContent = `🧠 ${m.mensaje}`;
+        listaHistorial.appendChild(item);
+      }
+      if (m.respuesta) {
+        agregarMensaje(m.respuesta, 'bot');
+        const item = document.createElement('li');
+        item.textContent = `🤖 ${m.respuesta}`;
+        listaHistorial.appendChild(item);
+      }
+    });
 
   } catch (error) {
     console.error("No se pudo cargar el historial:", error);
   }
 };
+

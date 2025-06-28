@@ -13,7 +13,10 @@ const patrones = [
   { clave: "tristeza", regex: /\b(triste|tristeza|deprimido|melancolía|desanimado|llorando)\b/i },
   { clave: "sorpresa", regex: /\b(sorpresa|sorprendido|inesperado|me sorprendió|sorprendente)\b/i },
   { clave: "neutral", regex: /\b(neutral|normal|me siento bien|me siento ok|ni bien ni mal|meh)\b/i },
-  { clave: "funcionamiento", regex: /\b(manual|guía|instrucciones|ayuda|cómo usar|como funciona|uso|funciona)\b/i }
+  { clave: "funcionamiento", regex: /\b(manual|guía|instrucciones|ayuda|cómo usar|como funciona|uso|funciona)\b/i },
+  { clave: "sustituir", regex: /\b(usar|usarte|sustituye|sustituya|psico|terapia|profesional|sustituyes|ayuda)\b/i},
+  { clave: "frecuencia", regex: /\b(cuantas|veces|verme|interactuar|frente|espejo)\b/i},
+  { clave: "incorrecta", regex: /\b(mal|equivocada|incorrecta|error|falsa|fallo).*emocion(es)?\b|\bemocion(es)?.*(mal|equivocada|incorrecta|error|falsa|fallo)\b/i},
 ];
 
 let esperandorespuesta = false;
