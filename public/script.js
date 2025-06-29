@@ -3,11 +3,10 @@ async function enviarMensaje() {
   const mensaje = input.value.trim();
 
   if (!mensaje) {
-    document.getElementById('respuesta').innerText = "Te voy a pegar si vuelves a mandar algo vacío";
+    alert("Te voy a pegar si vuelves a mandar algo vacío");
     return;
   }
 
-  // Mostrar el mensaje del usuario en el chat
   agregarMensaje(mensaje, 'usuario');
   input.value = '';
 
@@ -22,7 +21,10 @@ async function enviarMensaje() {
 
     const data = await res.json();
     const respuesta = data.respuesta || "Lo siento, no encontré coincidencias con tu búsqueda.";
+
     agregarMensaje(respuesta, 'bot');
+    agregarHistorialSidebar(mensaje, respuesta);
+
   } catch (error) {
     agregarMensaje("Hubo un error al conectarse con el bot.", 'bot');
   }
@@ -37,25 +39,42 @@ function agregarMensaje(texto, tipo) {
   chat.scrollTop = chat.scrollHeight;
 }
 
+function agregarHistorialSidebar(pregunta, respuesta) {
+  const listaHistorial = document.getElementById('lista-historial');
+  const item = document.createElement('li');
+
+  const fecha = new Date().toLocaleString('es-MX', {
+    hour: '2-digit',
+    minute: '2-digit',
+    day: '2-digit',
+    month: '2-digit'
+  });
+
+  item.innerHTML = `🧠 ${pregunta}<br>🤖 ${respuesta}<br><small>${fecha}</small>`;
+  listaHistorial.appendChild(item);
+}
+
 window.onload = async () => {
+  // 🔄 Limpiar el chat y el historial lateral
+  document.getElementById('chat').innerHTML = '';
+  document.getElementById('lista-historial').innerHTML = '';
+
   try {
     const res = await fetch('/historial');
     const historial = await res.json();
 
-    const listaHistorial = document.getElementById('lista-historial');
-
     historial.forEach(m => {
-      if (m.mensaje) {
-        agregarMensaje(m.mensaje, 'usuario');
+      if (m.mensaje && m.respuesta && m.fecha) {
+        const fecha = new Date(m.fecha).toLocaleString('es-MX', {
+          hour: '2-digit',
+          minute: '2-digit',
+          day: '2-digit',
+          month: '2-digit'
+        });
+
         const item = document.createElement('li');
-        item.textContent = `🧠 ${m.mensaje}`;
-        listaHistorial.appendChild(item);
-      }
-      if (m.respuesta) {
-        agregarMensaje(m.respuesta, 'bot');
-        const item = document.createElement('li');
-        item.textContent = `🤖 ${m.respuesta}`;
-        listaHistorial.appendChild(item);
+        item.innerHTML = `🧠 ${m.mensaje}<br>🤖 ${m.respuesta}<br><small>${fecha}</small>`;
+        document.getElementById('lista-historial').appendChild(item);
       }
     });
 
@@ -63,4 +82,3 @@ window.onload = async () => {
     console.error("No se pudo cargar el historial:", error);
   }
 };
-
