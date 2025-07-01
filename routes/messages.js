@@ -4,27 +4,31 @@ const Respuesta = require('../models/Respuesta');
 const historial = require('../models/historial');
 
 const patrones = [
-  { clave: "saludo", regex: /\b(hola|buenas|hey|hello|q onda|holi|ola|oli|q show)\b/i },
-  { clave: "emociones", regex: /\b(qué|cuáles|cuales|es cierto que|puedes|sabes)?\s*(emociones|sentimientos)\b.*\b(manejas|detectas|reconoces|lees|procesas|usas|analizas|describes|muestras|sabes|interpreta(s)?)\b|\b(manejas|detectas|reconoces|lees|procesas|usas|analizas|describes|muestras|sabes|interpreta(s)?)\b.*\b(emociones|sentimientos)\b/i },
+  { clave: "Tenojo", regex: /\b(t[eé]cnicas|estrategias|consejos|formas|maneras)\b.*\b(enojo|enojado|ira|molesto|rabia|furia)\b/i },
+  { clave: "Tdisgusto", regex: /\b(t[eé]cnicas|estrategias|consejos|formas|maneras)\b.*\b(disgusto|asco|repuls[ií]on|desagrado)\b/i },
+  { clave: "Tmiedo", regex: /\b(t[eé]cnicas|estrategias|consejos|formas|maneras)\b.*\b(miedo|temor|p[aá]nico|ansiedad|asustado)\b/i },
+  { clave: "Tfelicidad", regex: /\b(t[eé]cnicas|estrategias|consejos|formas|maneras)\b.*\b(felicidad|alegr[ií]a|contento|feliz)\b/i },
+  { clave: "Ttristeza", regex: /\b(t[eé]cnicas|estrategias|consejos|formas|maneras)\b.*\b(tristeza|triste|deprimido|melancol[ií]a|des[aá]nimo)\b/i },
+  { clave: "Tsorpresa", regex: /\b(t[eé]cnicas|estrategias|consejos|formas|maneras)\b.*\b(sorpresa|sorprendido|inesperado|asombro)\b/i },
+  { clave: "Tneutral", regex: /\b(t[eé]cnicas|estrategias|consejos|formas|maneras)\b.*\b(neutral|ni bien ni mal|meh|normal|emoc[ií]on neutral)\b/i },
   { clave: "enojo", regex: /\b(enojo|enojado|molesto|ira|rabia|furia)\b/i },
   { clave: "disgusto", regex: /\b(disgusto|asco|repulsión|desagrado|me desagrada)\b/i },
-  { clave: "miedo", regex: /\b(miedo|temor|pánico|me asusta|asustado|ansiedad)\b/i },
+  { clave: "miedo", regex: /\b(miedo|temor|pánico|me asusta|asustado|ansiedad|nervios)\b/i },
   { clave: "felicidad", regex: /\b(feliz|felicidad|alegría|contento|me siento bien)\b/i },
   { clave: "tristeza", regex: /\b(triste|tristeza|deprimido|melancolía|desanimado|llorando)\b/i },
   { clave: "sorpresa", regex: /\b(sorpresa|sorprendido|inesperado|me sorprendió|sorprendente)\b/i },
   { clave: "neutral", regex: /\b(neutral|normal|me siento bien|me siento ok|ni bien ni mal|meh)\b/i },
-  { clave: "funcionamiento", regex: /\b(manual|guía|instrucciones|ayuda|cómo usar|como funciona|uso|colgar|colgarte|funcionas)\b/i },
-  { clave: "sustituir", regex: /\b(usar|usarte|sustituye|sustituya|psico|terapia|profesional|sustituyes|ayuda|verme)\b/i},
-  { clave: "frecuencia", regex: /\b(cuantas|veces|verme|interactuar|frente|espejo)\b/i},
-  { clave: "incorrecta", regex: /\b(mal|equivocada|incorrecta|error|falsa|fallo).*emocion(es)?\b|\bemocion(es)?.*(mal|equivocada|incorrecta|error|falsa|fallo)\b/i},
-  { clave: "Tenojo", regex: /\b(tecnicas regulacion enojo|como regular el enojo|consejos para el enojo)\b/i},
-  { clave: "Tdisgusto", regex: /\b(tecnicas regulacion disgusto|como regular el disgusto|consejos para el disgusto)\b/i},
-  { clave: "Tmiedo", regex: /\b(tecnicas regulacion del miedo|como regular el miedo|consejos para el miedo)\b/i},
-  { clave: "Tfelicidad", regex: /\b(tecnicas para la felicidad|como manejar la felicidad|consejos para la felicidad)\b/i},
-  { clave: "Ttristeza", regex: /\b(tecnicas regulacion tristeza|como regular la tristeza|consejos para la tristeza)\b/i},
-  { clave: "Tsorpresa", regex: /\b(tecnicas regulacion de la sorpresa|como regular la sorpresa|consejos para la sorpesa)\b/i},
-  { clave: "Tneutral", regex: /\b(tecnicas regulacion emocion neutral|como regular el ni bien ni mal)\b/i}
+  { clave: "saludo", regex: /\b(hola|buenas|hey|hello|q onda|holi|ola|oli|q show)\b/i },
+  { clave: "emociones", regex: /\b(emociones|sentimientos)\b.*\b(básicas|principales|tipos|clases|fundamentales|primarias)?\b/i },
+  { clave: "emociones", regex: /\b(qué|cuáles|puedes|sabes)?\s*(emociones|sentimientos)\b.*\b(manejas|detectas|lees|usas|interpreta(s)?)\b/i },
+  { clave: "funcionamiento", regex: /\b(manual|guía|instrucciones|ayuda|cómo usar|como funciona|uso|colgar|colgarte|funcionas|q hace|que hace|k hace)\b/i },
+  { clave: "sustituir", regex: /\b(usar|usarte|sustituye|sustituya|psico|terapia|profesional|sustituyes|ayuda|verme)\b/i },
+  { clave: "frecuencia", regex: /\b(cuantas|veces|verme|interactuar|frente|espejo)\b/i },
+  { clave: "incorrecta", regex: /\b(mal|equivocada|incorrecta|error|falsa|fallo).*emocion(es)?\b|\bemocion(es)?.*(mal|equivocada|incorrecta|error|falsa|fallo)\b/i },
+  { clave: "estado", regex: /\b(estas|encuentras|esta|todo bien?|esta|encuentra)\b/i },
+  { clave: "nombre", regex: /\b(llamas|nombre)\b/i },
 ];
+
 
 let esperandorespuesta = false;
 let esperandoTecnica = null;
