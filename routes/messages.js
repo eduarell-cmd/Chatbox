@@ -21,7 +21,7 @@ const patrones = [
   { clave: "saludo", regex: /\b(hola|buenas|hey|hello|q onda|holi|ola|oli|q show)\b/i },
   { clave: "emociones", regex: /\b(emociones|sentimientos)\b.*\b(básicas|principales|tipos|clases|fundamentales|primarias)?\b/i },
   { clave: "emociones", regex: /\b(qué|cuáles|puedes|sabes)?\s*(emociones|sentimientos)\b.*\b(manejas|detectas|lees|usas|interpreta(s)?)\b/i },
-  { clave: "funcionamiento", regex: /\b(manual|guía|instrucciones|ayuda|cómo usar|como funciona|uso|colgar|colgarte|funcionas|q hace|que hace|k hace)\b/i },
+  { clave: "funcionamiento", regex: /\b(jalas|manual|guía|instrucciones|ayuda|cómo usar|como funciona|uso|colgar|colgarte|funcionas|q hace|que hace|k hace)\b/i },
   { clave: "sustituir", regex: /\b(usar|usarte|sustituye|sustituya|psico|terapia|profesional|sustituyes|ayuda|verme)\b/i },
   { clave: "frecuencia", regex: /\b(cuantas|veces|verme|interactuar|frente|espejo)\b/i },
   { clave: "incorrecta", regex: /\b(mal|equivocada|incorrecta|error|falsa|fallo).*emocion(es)?\b|\bemocion(es)?.*(mal|equivocada|incorrecta|error|falsa|fallo)\b/i },
@@ -37,10 +37,9 @@ router.post('/', async (req, res) => {
   const mensaje = req.body?.mensaje?.toLowerCase();
 
   if (!mensaje) {
-    return res.status(400).json({ error: 'No enviaste mensaje' });
+    return res.status(400).json({ error: 'Envia algo o te pego' });
   }
 
-  // Si esperamos respuesta de técnicas
   if (esperandoTecnica) {
     if (/\b(sí|si|claro|dale|va|ok|porfa)\b/.test(mensaje)) {
       const claveTecnica = "T" + esperandoTecnica;
@@ -86,7 +85,6 @@ router.post('/', async (req, res) => {
     return res.json({ respuesta: texto });
   }
 
-  // Si pregunta por emociones
   if (/\b(emociones?|sentimientos?)\b.*\b(manejas|detectas|reconoces|lees|procesas|usas|tomas en cuenta)\b|\b(manejas|detectas|reconoces|lees|procesas|usas)\b.*\b(emociones?|sentimientos?)\b/.test(mensaje)) {
     esperandorespuesta = true;
     const respuesta = await Respuesta.findOne({ clave: "emociones" });
@@ -96,7 +94,6 @@ router.post('/', async (req, res) => {
     return res.json({ respuesta: texto });
   }
 
-  // Buscar en patrones normales
   const encontrado = patrones.find(p => p.regex.test(mensaje));
   if (!encontrado) {
     const texto = "Lo siento, no entendí eso.";
@@ -126,7 +123,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-// ✅ Ruta para obtener historial
 router.get('/', async (req, res) => {
   try {
     const historialCompleto = await historial.find().sort({ fecha: 1 });
