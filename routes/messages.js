@@ -13,10 +13,17 @@ const patrones = [
   { clave: "tristeza", regex: /\b(triste|tristeza|deprimido|melancolía|desanimado|llorando)\b/i },
   { clave: "sorpresa", regex: /\b(sorpresa|sorprendido|inesperado|me sorprendió|sorprendente)\b/i },
   { clave: "neutral", regex: /\b(neutral|normal|me siento bien|me siento ok|ni bien ni mal|meh)\b/i },
-  { clave: "funcionamiento", regex: /\b(manual|guía|instrucciones|ayuda|cómo usar|como funciona|uso|funciona)\b/i },
-  { clave: "sustituir", regex: /\b(usar|usarte|sustituye|sustituya|psico|terapia|profesional|sustituyes|ayuda)\b/i},
+  { clave: "funcionamiento", regex: /\b(manual|guía|instrucciones|ayuda|cómo usar|como funciona|uso|colgar|colgarte|funcionas)\b/i },
+  { clave: "sustituir", regex: /\b(usar|usarte|sustituye|sustituya|psico|terapia|profesional|sustituyes|ayuda|verme)\b/i},
   { clave: "frecuencia", regex: /\b(cuantas|veces|verme|interactuar|frente|espejo)\b/i},
   { clave: "incorrecta", regex: /\b(mal|equivocada|incorrecta|error|falsa|fallo).*emocion(es)?\b|\bemocion(es)?.*(mal|equivocada|incorrecta|error|falsa|fallo)\b/i},
+  { clave: "Tenojo", regex: /\b(tecnicas regulacion enojo|como regular el enojo|consejos para el enojo)\b/i},
+  { clave: "Tdisgusto", regex: /\b(tecnicas regulacion disgusto|como regular el disgusto|consejos para el disgusto)\b/i},
+  { clave: "Tmiedo", regex: /\b(tecnicas regulacion del miedo|como regular el miedo|consejos para el miedo)\b/i},
+  { clave: "Tfelicidad", regex: /\b(tecnicas para la felicidad|como manejar la felicidad|consejos para la felicidad)\b/i},
+  { clave: "Ttristeza", regex: /\b(tecnicas regulacion tristeza|como regular la tristeza|consejos para la tristeza)\b/i},
+  { clave: "Tsorpresa", regex: /\b(tecnicas regulacion de la sorpresa|como regular la sorpresa|consejos para la sorpesa)\b/i},
+  { clave: "Tneutral", regex: /\b(tecnicas regulacion emocion neutral|como regular el ni bien ni mal)\b/i}
 ];
 
 let esperandorespuesta = false;

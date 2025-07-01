@@ -41,7 +41,7 @@ h1 {
   min-width: 200px;
   max-width: 300px;
   background-color: #1f1f1f;
-  color: white;
+  color: #ff5f79ff;
   padding: 1rem;
   overflow-y: auto;
   border-top-left-radius: 10px;
@@ -90,7 +90,7 @@ h1 {
 .input-area button {
   margin-left: 10px;
   padding: 10px 20px;
-  background: rgb(71 129 255);
+  background:#d20972ff;
   color: white;
   border: none;
   border-radius: 6px;
@@ -105,7 +105,7 @@ h1 {
 /* Burbujas */
 .mensaje-usuario {
   align-self: flex-end;
-  background-color: rgb(71 129 255);
+  background-color:#d400ff;
   padding: 10px 15px;
   border-radius: 15px;
   max-width: 70%;
@@ -114,7 +114,7 @@ h1 {
 
 .mensaje-bot {
   align-self: flex-start;
-  background-color: #f1f0f0;
+  background-color: #d20972ff;
   padding: 10px 15px;
   border-radius: 15px;
   max-width: 70%;

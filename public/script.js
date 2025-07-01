@@ -50,7 +50,7 @@ function agregarHistorialSidebar(pregunta, respuesta) {
     month: '2-digit'
   });
 
-  item.innerHTML = `🧠 ${pregunta}<br>🤖 ${respuesta}<br><small>${fecha}</small>`;
+  item.innerHTML = `USER: ${pregunta}<br>MAI: ${respuesta}<br><small>${fecha}</small>`;
   listaHistorial.appendChild(item);
 }
 
@@ -73,7 +73,7 @@ window.onload = async () => {
         });
 
         const item = document.createElement('li');
-        item.innerHTML = `🧠 ${m.mensaje}<br>🤖 ${m.respuesta}<br><small>${fecha}</small>`;
+        item.innerHTML = `USER: ${m.mensaje}<br>MAI: ${m.respuesta}<br><small>${fecha}</small>`;
         document.getElementById('lista-historial').appendChild(item);
       }
     });
