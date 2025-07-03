@@ -27,6 +27,7 @@ const patrones = [
   { clave: "incorrecta", regex: /\b(mal|equivocada|incorrecta|error|falsa|fallo).*emocion(es)?\b|\bemocion(es)?.*(mal|equivocada|incorrecta|error|falsa|fallo)\b/i },
   { clave: "estado", regex: /\b(estas|encuentras|esta|todo bien?|esta|encuentra)\b/i },
   { clave: "nombre", regex: /\b(llamas|nombre)\b/i },
+  { clave: "funcionamiento2", regex: /\b(pilas|corriente|conectar)\b/i}
 ];
 
 
@@ -37,8 +38,11 @@ router.post('/', async (req, res) => {
   const mensaje = req.body?.mensaje?.toLowerCase();
 
   if (!mensaje) {
-    return res.status(400).json({ error: 'Envia algo o te pego' });
+    const texto = "Envia algo o te pego";
+    await historial.create({ mensaje: "", respuesta: texto });
+    return res.json({ respuesta: texto });
   }
+
 
   if (esperandoTecnica) {
     if (/\b(sí|si|claro|dale|va|ok|porfa)\b/.test(mensaje)) {

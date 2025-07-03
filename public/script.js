@@ -2,11 +2,6 @@ async function enviarMensaje() {
   const input = document.getElementById('mensaje');
   const mensaje = input.value.trim();
 
-  if (!mensaje) {
-    alert("Te voy a pegar si vuelves a mandar algo vacío");
-    return;
-  }
-
   agregarMensaje(mensaje, 'usuario');
   input.value = '';
 
